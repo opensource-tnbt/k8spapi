@@ -18,7 +18,7 @@ from tabulate import tabulate
 from conf import merge_spec
 from conf import settings
 from tools import tasks
-from tools.pkt_gen.prox import Prox
+from pods.papi import papi
 
 
 VERBOSITY_LEVELS = {
@@ -66,8 +66,8 @@ def main():
     if not os.path.exists(results_path):
         os.makedirs(results_path)
 
-    trafficgen = Prox()
-    trafficgen.send_rfc2544_throughput()
+    papiref = papi.Papi()
+    print("Ok.. We are ready")
 
 
 if __name__ == "__main__":
