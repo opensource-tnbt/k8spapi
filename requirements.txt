@@ -1,0 +1,43 @@
+# Copyright (c) 2015-2018 Intel corporation, Spirent Communications
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Apache License, Version 2.0
+# which accompanies this distribution, and is available at
+# http://www.apache.org/licenses/LICENSE-2.0
+
+future
+pexpect>=4.0
+tox==1.8.1
+jinja2
+xmlrunner==1.7.7
+requests>=2.14.2
+netaddr==0.7.18
+scapy-python3==0.18
+pylint==1.8.2
+distro
+stcrestclient
+matplotlib
+numpy
+pycrypto
+tabulate
+pypsi
+paramiko
+keystoneauth1>=2.18.0
+os-client-config>=1.22.0
+oslo.concurrency>=3.8.0
+oslo.config>=3.14.0
+oslo.log>=3.11.0
+oslo.serialization>=1.10.0
+oslo.utils>=3.18.0
+pygal
+pykwalify
+python-glanceclient>=2.5.0
+python-neutronclient>=5.1.0
+python-novaclient>=7.1.0
+python-heatclient>=1.6.1
+python-subunit>=0.0.18
+PyYAML>=3.10.0
+pyzmq>=16.0
+six>=1.9.0
+timeout-decorator>=0.4.0
+kubernetes

@@ -1,0 +1,79 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.confc
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+build/
+develop-eggs/
+dist/
+eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+#  Usually these files are written by a python script from a template 
+#  before PyInstaller builds the exe, so as to inject date/other infos into it.
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.cache
+nosetests.xml
+coverage.xml
+
+# Translations
+*.mo
+*.pot
+
+# Log files:
+*.log
+
+# Sphinx documentation
+
+# PyBuilder
+target/
+
+# SublimeText
+*.sublime-project
+*.sublime-workspace
+
+*~
+.*.sw?
+/docs_output/
+/releng/
+/src/dpdk/dpdk/
+/src/ovs/ovs/
+/src/qemu/qemu/
+/src/vpp/vpp/
+/src_cuse/
+/src_vanilla/
+/src/trex/trex
+.vagrant
+tags
+
+# Ignore all files in l2fwd except those prefaced by "!"
+/src/l2fwd
+!/src/l2fwd/gen_debian_package.sh
+!/src/l2fwd/l2fwd.c
+!/src/l2fwd/LICENSE.txt
+!/src/l2fwd/Makefile
+
+docs/_build/*
