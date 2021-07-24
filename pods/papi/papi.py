@@ -24,6 +24,7 @@ import time
 import yaml
 from kubernetes import client, config
 from kubernetes.client.rest import ApiException
+from kubernetes.stream import stream
 
 from conf import settings as S
 from tools import tasks
@@ -70,6 +71,40 @@ class IPod(tasks.Process):
         """
         IPod._number_pods = 0
 
+
+def execute_command(api_instance, pod_info, exec_command):
+    """
+    Execute a command inside a specified pod
+    exec_command = list of strings
+    """
+    name = pod_info['name']
+    resp = None
+    try:
+        resp = api_instance.read_namespaced_pod(name=name,
+                                                namespace='default')
+    except ApiException as e:
+        if e.status != 404:
+            print("Unknown error: %s" % e)
+            exit(1)
+    if not resp:
+        print("Pod %s does not exist. Creating it..." % name)
+        return -1
+
+    # Calling exec and waiting for response
+    #exec_command = [
+    #    '/bin/sh',
+    #    '-c',
+    #    'echo This message goes to stderr; echo This message goes to stdout']
+    resp = stream(api_instance.connect_get_namespaced_pod_exec,
+                  name,
+                  'default',
+                  command=exec_command,
+                  stderr=True, stdin=False,
+                  stdout=True, tty=False)
+    print("Response: " + resp)
+    return resp
+
+
 class Papi(IPod):
     """
     Class for controlling the pod through PAPI
@@ -94,9 +129,13 @@ class Papi(IPod):
         config.load_kube_config(S.getValue('K8S_CONFIG_FILEPATH'))
         # create vswitchperf namespace
         api = client.CoreV1Api()
-        namespace = 'default'
+        if S.hasValue('POD_NAMESPACE'):
+            namespace = S.getValue('POD_NAMESPACE')
+        else:
+            namespace = 'default'
         pod_manifests = S.getValue('POD_MANIFEST_FILEPATH')
         pod_count = int(S.getValue('POD_COUNT'))
+        dep_pod_list = []
         #namespace = 'vswitchperf'
         # replace_namespace(api, namespace)
 
@@ -131,16 +170,50 @@ class Papi(IPod):
         api = client.CoreV1Api()
         
         for count in range(pod_count):
+            dep_pod_info = {}
             pod_manifest = load_manifest(pod_manifests[count])
-
+            dep_pod_info['name'] = pod_manifest["metadata"]["name"]
             try:
                 response = api.create_namespaced_pod(namespace, pod_manifest)
                 self._logger.info(str(response))
                 self._logger.info("Created POD %d ...", self._number)
             except ApiException as err:
                 raise Exception from err
+            # Wait for the pod to start
+            time.sleep(5)
+            status = "Unknown"
+            count = 0
+            while True:
+                if count == 10:
+                    break
+                try:
+                    response = api.read_namespaced_pod_status(dep_pod_info['name'],
+                            namespace)
+                    status = response.status.phase
+                except ApiException as err:
+                    raise Exception from err
+                if (status == "Running"
+                        or status == "Failed"
+                        or status == "Unknown"):
+                    break
+                else:
+                    time.sleep(5)
+                    count = count + 1
+            # Now Get the Pod-IP
+            try:
+                response = api.read_namespaced_pod_status(dep_pod_info['name'],
+                        namespace)
+                dep_pod_info['pod_ip'] = response.status.pod_ip
+            except ApiException as err:
+                raise Exception from err
+            dep_pod_info['namespace'] = namespace
+            dep_pod_list.append(dep_pod_info)
+            cmd = ['cat', '/etc/podnetinfo/annotations']
+            execute_command(api, dep_pod_info, cmd)
+        
+        S.setValue('POD_LIST',dep_pod_list)
+        return dep_pod_list
 
-        time.sleep(12)
 
     def terminate(self):
         """

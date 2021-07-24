@@ -19,7 +19,9 @@ from conf import merge_spec
 from conf import settings
 from tools import tasks
 from pods.papi import papi
-
+from kubernetes import client, config
+from kubernetes.client.rest import ApiException
+from kubernetes.stream import stream
 
 VERBOSITY_LEVELS = {
     'debug': logging.DEBUG,
@@ -66,9 +68,10 @@ def main():
     if not os.path.exists(results_path):
         os.makedirs(results_path)
 
-    papiref = papi.Papi()
-    print("Ok.. We are ready")
-
+    #papiref = papi.Papi()
+    config.load_kube_config(settings.getValue('K8S_CONFIG_FILEPATH'))
+    api = client.CoreV1Api()
+    return
 
 if __name__ == "__main__":
     main()
